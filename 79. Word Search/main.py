@@ -5,19 +5,16 @@ class Solution(object):
         :type word: str
         :rtype: bool
         """
-        first = word[0]
-        positions = self.find(board, first)
-        for position in positions:
-            used_positions = set()
-            r, c = position
-            if self.is_ok(board, r, c, word, used_positions):
-                return True
+        for row in range(len(board)):
+            for col in range(len(board[0])):
+                used_positions = set()
+                if self.find_word(board, row, col, word, used_positions):
+                    return True
         return False
 
-    def is_ok(self, board, row, col, word, used_positions):
+    def find_word(self, board, row, col, word, used_positions):
         if len(word) == 1:
             if board[row][col] == word[0]:
-                print(row, col)
                 return True
             else:
                 return False
@@ -31,7 +28,7 @@ class Solution(object):
             locations = self.get_ajacent_positions(board, row, col, used_positions1)
             for location in locations:
                 r, c = location
-                if self.is_ok(board, r, c, left, used_positions):
+                if self.find_word(board, r, c, left, used_positions1):
                     return True
             return False
 
@@ -50,7 +47,7 @@ class Solution(object):
         return [position for position in neighbor_positions
                 if self.is_position_ok(position, len(board), len(board[0]), used_positions)]
 
-    def find(self, board, letter):
+    def find_letter(self, board, letter):
         res = []
         for idx1, row in enumerate(board):
             for idx2, col in enumerate(row):
@@ -75,7 +72,10 @@ if __name__ == "__main__":
     # board = ["ABCE","SFCS","ADEE"]
     # print(s.exist(board, 'ABCCED'))
 
-    # board = ["CAA", "AAA", "BCD"]
-    # print(s.exist(board, "AAB"))
+    board = ["CAA", "AAA", "BCD"]
+    assert(s.exist(board, "AAB") == True)
     board = ["ABCE","SFES","ADEE"]
-    print(s.exist(board, "ABCESEEEFS"))
+    assert(s.exist(board, "ABCESEEEFS") == True)
+
+    board = ["aa"]
+    assert(s.exist(board, "aaa") == False)
