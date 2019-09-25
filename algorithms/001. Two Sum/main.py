@@ -18,6 +18,16 @@ class Solution(object):
             if rem in nums[idx+1: ]:
                 return [idx, nums[idx+1: ].index(rem) + idx + 1]
         return None
+    
+    def twoSum2(self, nums, target):
+        map = {}
+        for idx, num in enumerate(nums):
+            rem = target - num
+            if map.get(rem) is not None:
+                return [map.get(rem), idx]
+            else:
+                map[num] = idx 
+
 
 if __name__ == "__main__":
     s = Solution()
@@ -26,3 +36,6 @@ if __name__ == "__main__":
 
     assert(s.twoSum1([2, 7, 11, 15], 9) == [0, 1])
     assert(s.twoSum1([3, 2, 4], 6) == [1, 2])
+
+    assert(s.twoSum2([2, 7, 11, 15], 9) == [0, 1])
+    assert(s.twoSum2([3, 2, 4], 6) == [1, 2])
