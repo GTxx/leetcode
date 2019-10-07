@@ -74,8 +74,6 @@ impl Solution {
         }
         return result_head.next;
     }
-
-
 }
 
 #[cfg(test)]
@@ -84,11 +82,10 @@ mod tests {
 
     #[test]
     fn test1() {
-        let l1 = ListNode::from(vec![1,2,3]);
-        let l2 = ListNode::from(vec![4,5,6]);
+        let l1 = ListNode::from(vec![1, 2, 3]);
+        let l2 = ListNode::from(vec![4, 5, 6]);
         let l3 = Solution::merge_two_lists(Some(Box::new(l1)), Some(Box::new(l2)));
-        println!("{:?}", l3);
-        panic!("intend");
+        assert_eq!(l3, Some(Box::new(ListNode::from(vec![1, 2, 3, 4, 5, 6]))));
     }
 
     #[test]
@@ -99,11 +96,10 @@ mod tests {
 
     #[test]
     fn test3() {
-        let l1 = ListNode::from(vec![1,2,4]);
-        let l2 = ListNode::from(vec![1,3,4]);
+        let l1 = ListNode::from(vec![1, 2, 4]);
+        let l2 = ListNode::from(vec![1, 3, 4]);
         let l3 = Solution::merge_two_lists(Some(Box::new(l1)), Some(Box::new(l2)));
-        println!("{:?}", l3);
-        assert_eq!(l3, None);
+        assert_eq!(l3, Some(Box::new(ListNode::from(vec![1, 1, 2, 3, 4, 4]))));
     }
 }
 
