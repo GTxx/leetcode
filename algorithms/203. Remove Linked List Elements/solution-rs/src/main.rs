@@ -8,10 +8,7 @@ pub struct ListNode {
 impl ListNode {
     #[inline]
     fn new(val: i32) -> Self {
-        ListNode {
-            next: None,
-            val,
-        }
+        ListNode { next: None, val }
     }
 
     fn from(v: Vec<i32>) -> Option<Box<ListNode>> {
@@ -37,7 +34,14 @@ impl Solution {
         }
     }
 
-    fn take_first_n(head: Option<Box<ListNode>>, n: i32) -> (Vec<Option<Box<ListNode>>>, Option<Box<ListNode>>) {
+    fn take_rest(head: Option<&mut Box<ListNode>>) -> Option<Box<ListNode>> {
+       head.and_then(|node| node.next.take())
+    }
+
+    fn take_first_n(
+        head: Option<Box<ListNode>>,
+        n: i32,
+    ) -> (Vec<Option<Box<ListNode>>>, Option<Box<ListNode>>) {
         let mut i = 0;
         let mut first_n = vec![];
         let mut head_p = head;
@@ -83,14 +87,31 @@ impl Solution {
                 break;
             }
         }
-        return new_head.unwrap().next;
+        return new_head.and_then(|mut node| node.next.take());
+    }
+
+    pub fn remove_elements_iter1(head: Option<Box<ListNode>>, val: i32) -> Option<Box<ListNode>> {
+        let mut new_head = Some(Box::new(ListNode::new(0)));
+        let mut mut_head = head;
+        let mut prev = new_head.as_mut();
+        while let Some(rest_node) = mut_head.as_mut().and_then(|n| n.next.take()) {
+            if let Some(n) = mut_head {
+                if n.val != val {
+                    if let Some( x) = prev {
+                        x.next = Some(n);
+                        prev = x.next.as_mut();
+                    }
+                }
+            }
+            mut_head = Some(rest_node);
+        }
+        return new_head.and_then(|node| node.next);
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{Solution, ListNode};
+    use crate::{ListNode, Solution};
 
     #[test]
     fn base_test() {
@@ -111,24 +132,63 @@ mod tests {
         assert_eq!(rest, ListNode::from(vec![2]));
 
         let (first_n, rest) = Solution::take_first_n(ListNode::from(vec![1, 2]), 3);
-        assert_eq!(first_n, vec![Some(Box::new(ListNode::new(1))), Some(Box::new(ListNode::new(2)))]);
+        assert_eq!(
+            first_n,
+            vec![
+                Some(Box::new(ListNode::new(1))),
+                Some(Box::new(ListNode::new(2)))
+            ]
+        );
         assert_eq!(rest, ListNode::from(vec![]));
     }
 
     #[test]
     fn test() {
-        assert_eq!(ListNode::from(vec![1, 2]), Solution::remove_elements(ListNode::from(vec![1, 2, 3]), 3));
+        assert_eq!(
+            ListNode::from(vec![1, 2]),
+            Solution::remove_elements(ListNode::from(vec![1, 2, 3]), 3)
+        );
 
-        assert_eq!(ListNode::from(vec![]), Solution::remove_elements(ListNode::from(vec![]), 3));
+        assert_eq!(
+            ListNode::from(vec![]),
+            Solution::remove_elements(ListNode::from(vec![]), 3)
+        );
 
-        assert_eq!(ListNode::from(vec![1, 2, 3, 4, 5]), Solution::remove_elements(ListNode::from(vec![1, 2, 6, 3, 4, 5, 6]), 6));
+        assert_eq!(
+            ListNode::from(vec![1, 2, 3, 4, 5]),
+            Solution::remove_elements(ListNode::from(vec![1, 2, 6, 3, 4, 5, 6]), 6)
+        );
     }
 
     #[test]
-    fn test1 () {
-        assert_eq!(ListNode::from(vec![1, 2]), Solution::remove_elements_iter(ListNode::from(vec![1, 2, 3]), 3));
-        assert_eq!(ListNode::from(vec![]), Solution::remove_elements_iter(ListNode::from(vec![]), 3));
-        assert_eq!(ListNode::from(vec![1, 2, 3, 4, 5]), Solution::remove_elements_iter(ListNode::from(vec![1, 2, 6, 3, 4, 5, 6]), 6));
+    fn test1() {
+        assert_eq!(
+            ListNode::from(vec![1, 2]),
+            Solution::remove_elements_iter(ListNode::from(vec![1, 2, 3]), 3)
+        );
+        assert_eq!(
+            ListNode::from(vec![]),
+            Solution::remove_elements_iter(ListNode::from(vec![]), 3)
+        );
+        assert_eq!(
+            ListNode::from(vec![1, 2, 3, 4, 5]),
+            Solution::remove_elements_iter(ListNode::from(vec![1, 2, 6, 3, 4, 5, 6]), 6)
+        );
+    }
+    #[test]
+    fn test2() {
+        assert_eq!(
+            ListNode::from(vec![1, 2]),
+            Solution::remove_elements_iter1(ListNode::from(vec![1, 2, 3]), 3)
+        );
+        assert_eq!(
+            ListNode::from(vec![]),
+            Solution::remove_elements_iter1(ListNode::from(vec![]), 3)
+        );
+        assert_eq!(
+            ListNode::from(vec![1, 2, 3, 4, 5]),
+            Solution::remove_elements_iter1(ListNode::from(vec![1, 2, 6, 3, 4, 5, 6]), 6)
+        );
     }
 }
 
