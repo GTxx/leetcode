@@ -37,9 +37,7 @@ impl Solution {
 
         while l1_current.is_some() && l2_current.is_some() {
             // take content and ownership from l1_current and l2_current, leave l1_current = None, l2_current = None
-            let l1_d = l1_current.take();
-            let l2_d = l2_current.take();
-            if let (Some(mut l1_head), Some(mut l2_head)) = (l1_d, l2_d) {
+            if let (Some(mut l1_head), Some(mut l2_head)) = (l1_current.take(), l2_current.take()) {
                 if l1_head.val <= l2_head.val {
                     l1_current = l1_head.next.take();
                     // reassign l2_current to get back it's content
