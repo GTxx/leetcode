@@ -25,10 +25,10 @@ impl Solution {
     pub fn reverse_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
         let mut tail = None;
         let mut mut_head = head;
-        while let Some(mut mut_head_ref) = mut_head.take() {
-            let next = mut_head_ref.next.take();
-            mut_head_ref.next = tail;
-            tail = Some(mut_head_ref);
+        while let Some(mut node) = mut_head.take() {
+            let next = node.next.take();
+            node.next = tail;
+            tail = Some(node);
             mut_head = next;
         }
         return tail;
@@ -40,12 +40,20 @@ mod tests {
     use crate::{ListNode, Solution};
 
     #[test]
-   fn test1() {
-        assert_eq!(ListNode::from(vec![]), Solution::reverse_list(ListNode::from(vec![])));
-
-        assert_eq!(ListNode::from(vec![1]), Solution::reverse_list(ListNode::from(vec![1])));
-        assert_eq!(ListNode::from(vec![1,2]), Solution::reverse_list(ListNode::from(vec![2,1])));
-   }
+    fn test1() {
+        assert_eq!(
+            ListNode::from(vec![]),
+            Solution::reverse_list(ListNode::from(vec![]))
+        );
+        assert_eq!(
+            ListNode::from(vec![1]),
+            Solution::reverse_list(ListNode::from(vec![1]))
+        );
+        assert_eq!(
+            ListNode::from(vec![1, 2]),
+            Solution::reverse_list(ListNode::from(vec![2, 1]))
+        );
+    }
 }
 fn main() {
     println!("Hello, world!");
