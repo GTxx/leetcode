@@ -1,5 +1,3 @@
-use std::ops::BitOr;
-
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ListNode {
     pub val: i32,
@@ -26,8 +24,36 @@ pub fn reverse(list: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
     unimplemented!();
 }
 
-pub fn pop(list: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    unimplemented!()
+pub fn pop(list: Option<Box<ListNode>>) -> (Option<Box<ListNode>>, Option<Box<ListNode>>) {
+    if let Some(mut node) = list {
+        let tail = node.next.take();
+        (Some(node), tail)
+    } else {
+        (None, None)
+    }
+}
+
+pub fn pop_n(
+    list: Option<Box<ListNode>>,
+    n: i32,
+) -> (Option<Box<ListNode>>, Option<Box<ListNode>>) {
+    let mut new_head = Some(Box::new(ListNode { val: 0, next: list }));
+    let mut mut_head = new_head.as_mut();
+    let mut i = 0;
+    while let Some(node) = mut_head {
+        if i < n {
+            i += 1;
+            mut_head = node.next.as_mut();
+        } else {
+            mut_head = Some(node);
+            break;
+        }
+    }
+    let rest = mut_head.and_then(|node| node.next.take());
+    (
+        new_head.and_then(|mut node| node.next.take()),
+        rest
+    )
 }
 
 pub fn split_n(list: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
@@ -116,7 +142,7 @@ impl Solution {
 }
 #[cfg(test)]
 mod tests {
-    use crate::{get_nth_mut_ref, length, ListNode, Solution};
+    use crate::{get_nth_mut_ref, length, ListNode, Solution, pop, pop_n};
 
     #[test]
     fn test() {
@@ -149,7 +175,14 @@ mod tests {
             get_nth_mut_ref(ListNode::from(vec![1, 2, 3]).as_mut(), 4),
             None
         );
-        panic!("123")
+
+        assert_eq!(pop(ListNode::from(vec![1,2,3])), (ListNode::from(vec![1]), ListNode::from(vec![2,3])));
+        assert_eq!(pop(ListNode::from(vec![])), (None, None));
+
+        assert_eq!(pop_n(ListNode::from(vec![1,2]), 1), (ListNode::from(vec![1]), ListNode::from(vec![2])));
+        assert_eq!(pop_n(ListNode::from(vec![1,2]), 0), (None, ListNode::from(vec![1, 2])));
+        assert_eq!(pop_n(ListNode::from(vec![1,2]), 2), (ListNode::from(vec![1, 2]), None));
+        assert_eq!(pop_n(ListNode::from(vec![1,2]), 3), (ListNode::from(vec![1, 2]), None));
     }
     #[test]
     fn test1() {
