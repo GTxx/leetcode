@@ -14,9 +14,32 @@ class Solution(object):
                 return False
         return True
 
+    def canConstruct1(self, ransomNote, magazine):
+        d = {}
+        for c in magazine:
+            if d.get(c):
+                d[c] += 1
+            else:
+                d[c] = 1
+        for c in ransomNote:
+            if d.get(c):
+                if d[c] >= 1:
+                    d[c] -= 1
+                else:
+                    return False
+            else:
+                return False
+        return True
+
+
 
 if __name__ == "__main__":
+    from algorithms import test
     s = Solution()
-    print s.canConstruct('a', 'b')
-    print s.canConstruct('aa', 'ab')
-    print s.canConstruct('aa', 'aab')
+    test(('a', 'b'), False, s.canConstruct)
+    test(('aa', 'ab'), False, s.canConstruct)
+    test(('aa', 'aab'), True, s.canConstruct)
+
+    test(('a', 'b'), False, s.canConstruct1)
+    test(('aa', 'ab'), False, s.canConstruct1)
+    test(('aa', 'aab'), True, s.canConstruct1)
