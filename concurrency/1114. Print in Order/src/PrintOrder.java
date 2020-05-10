@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 class PrintOrder {
@@ -28,48 +30,59 @@ class PrintOrder {
         printThird.run();
     }
 
-    public static void submit(int[] orders, PrintOrder printOrder, ExecutorService executorService) {
+    public static void submit(int[] orders, PrintOrder printOrder, ExecutorService executorService, Printer printer) {
+        List<Future<?>> futures = new ArrayList<>();
         for (int order : orders) {
             if (order == 1) {
-                executorService.submit(() -> {
+                futures.add(executorService.submit(() -> {
                     try {
-                        printOrder.first(() -> System.out.println("first"));
+                        printOrder.first(() -> printer.print("first"));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                });
+                }));
             } else if (order == 2) {
-                executorService.submit(() -> {
+                futures.add(executorService.submit(() -> {
                     try {
-                        printOrder.second(() -> System.out.println("second"));
+                        printOrder.second(() -> printer.print("second"));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                });
+                }));
             } else if (order == 3) {
-                executorService.submit(() -> {
+                futures.add(executorService.submit(() -> {
                     try {
-                        printOrder.third(() -> System.out.println("third"));
+                        printOrder.third(() -> printer.print("third"));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                });
+                }));
             } else {
                 throw new RuntimeException("not support number: " + order);
             }
         }
+
+        for (Future<?> future: futures) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println(printer.getOutput());
     }
 
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
 
-        submit(new int[]{1, 2, 3}, new PrintOrder(), executorService);
-        submit(new int[]{1, 3, 2}, new PrintOrder(), executorService);
-        submit(new int[]{2, 3, 1}, new PrintOrder(), executorService);
-        submit(new int[]{2, 1, 3}, new PrintOrder(), executorService);
-        submit(new int[]{3, 1, 2}, new PrintOrder(), executorService);
-        submit(new int[]{3, 2, 1}, new PrintOrder(), executorService);
-
+        submit(new int[]{1, 2, 3}, new PrintOrder(), executorService, new Printer());
+        submit(new int[]{1, 3, 2}, new PrintOrder(), executorService, new Printer());
+        submit(new int[]{2, 3, 1}, new PrintOrder(), executorService, new Printer());
+        submit(new int[]{2, 1, 3}, new PrintOrder(), executorService, new Printer());
+        submit(new int[]{3, 1, 2}, new PrintOrder(), executorService, new Printer());
+        submit(new int[]{3, 2, 1}, new PrintOrder(), executorService, new Printer());
         executorService.shutdown();
 
     }
